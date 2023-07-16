@@ -1,0 +1,12 @@
+version: v1
+
+lint:
+  use:
+    - DEFAULT
+  except:
+    - PACKAGE_DIRECTORY_MATCH # Don't want .proto files in their own subdirectory in this case
+    - PACKAGE_VERSION_SUFFIX # Using evergreen version
+    - SERVICE_SUFFIX # "Service" suffix is usually redundant
+    - RPC_REQUEST_STANDARD_NAME # "Request" suffix can make RPC less readable
+    - RPC_RESPONSE_STANDARD_NAME # "Response" suffix can make RPC less readable
+    - RPC_REQUEST_RESPONSE_UNIQUE # Reusing a response type doesn't prevent us from splitting it later, if we accept compile-time breaking chanegs
