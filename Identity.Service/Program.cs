@@ -2,6 +2,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication("api-key")
     .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("api-key", _ => {});
 builder.Services.AddAuthorization();
+builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, GrpcAuthorizationMiddlewareResultHandler>();
 builder.Services.AddHealthChecks();
 builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
