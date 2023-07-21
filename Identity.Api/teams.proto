@@ -14,7 +14,8 @@ service Teams {
   rpc Join         (TeamMembership) returns (google.protobuf.Empty);
   rpc Leave        (TeamMembership) returns (google.protobuf.Empty);
   rpc ListMembers  (TeamId)         returns (stream AccountId);
-  rpc FindByMember (AccountId)      returns (TeamId);
+  rpc FindByMember (AccountId)      returns (TeamId) {option deprecated = true;}
+  rpc ListByMember (AccountId)      returns (stream TeamId);
 }
 
 message TeamId {

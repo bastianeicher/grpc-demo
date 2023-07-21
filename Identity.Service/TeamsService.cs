@@ -53,9 +53,8 @@ public class TeamsService : Teams.TeamsBase
     {
         var account = await _db.Accounts.FirstOrDefaultAsync(x => x.Id == request.Account)
                    ?? throw new RpcException(new Status(StatusCode.NotFound, "not_found"));
-        if (account.Team != null) throw new RpcException(new Status(StatusCode.FailedPrecondition, "cannot_join_team"));
 
-        account.Team = await FindAsync(request.Team);
+        account.Teams.Add(await FindAsync(request.Team));
         await _db.SaveChangesAsync();
 
         return new();
@@ -68,9 +67,10 @@ public class TeamsService : Teams.TeamsBase
     public override async Task<Empty> Leave(TeamMembership request, ServerCallContext context)
     {
         var account = await FindAccountAsync(request.Account);
-        if (account.Team?.Id != request.Team) throw new RpcException(new Status(StatusCode.FailedPrecondition, "not_in_team"));
+        var team = account.Teams.FirstOrDefault(x => x.Id == request.Team)
+                ?? throw new RpcException(new Status(StatusCode.FailedPrecondition, "not_in_team"));
 
-        account.Team = null;
+        account.Teams.Remove(team);
         await _db.SaveChangesAsync();
         
         return new();
@@ -87,17 +87,25 @@ public class TeamsService : Teams.TeamsBase
             await responseStream.WriteAsync(new(account.Id));
     }
 
+    [Obsolete]
     public override async Task<TeamId> FindByMember(AccountId request, ServerCallContext context)
     {
         var account = await FindAccountAsync(request);
-        if (account.Team == null) throw new RpcException(new Status(StatusCode.FailedPrecondition, "not_in_team"));
+        var team = account.Teams.FirstOrDefault()
+                ?? throw new RpcException(new Status(StatusCode.FailedPrecondition, "not_in_team"));
+        return new(team.Id);
+    }
 
-        return new(account.Team.Id);
+    public override async Task ListByMember(AccountId request, IServerStreamWriter<TeamId> responseStream, ServerCallContext context)
+    {
+        var account = await FindAccountAsync(request);
+        foreach (var team in account.Teams)
+            await responseStream.WriteAsync(new(team.Id));
     }
 
     private async Task<AccountEntity> FindAccountAsync(AccountId accountId)
         => await _db.Accounts
-               .Include(x => x.Team)
+               .Include(x => x.Teams)
                .FirstOrDefaultAsync(x => x.Id == accountId) 
         ?? throw new RpcException(new Status(StatusCode.NotFound, "not_found"));
 }

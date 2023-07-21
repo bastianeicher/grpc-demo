@@ -1,4 +1,5 @@
-﻿using Grpc.Net.Client;
+﻿using Grpc.Core;
+using Grpc.Net.Client;
 using Identity.Api;
 
 using var channel = GrpcChannel.ForAddress("http://localhost:5201");
@@ -13,18 +14,40 @@ await accounts.CreateAsync(new()
     Email = $"{accountId}@example.com"
 });
 
-var teamId = new TeamId(Guid.NewGuid());
+var teamId1 = new TeamId(Guid.NewGuid());
 await teams.CreateAsync(new()
 {
-    Id = teamId,
+    Id = teamId1,
     Name = "Awesome Team",
     Seats = 1
 });
 
-await teams.JoinAsync(new() {Account = accountId, Team = teamId});
+var teamId2 = new TeamId(Guid.NewGuid());
+await teams.CreateAsync(new()
+{
+    Id = teamId2,
+    Name = "Another Awesome Team",
+    Seats = 1
+});
 
-Console.WriteLine($"Account {accountId} is member of team {await teams.FindByMemberAsync(accountId)}");
+await teams.JoinAsync(new() {Account = accountId, Team = teamId1});
+await teams.JoinAsync(new() {Account = accountId, Team = teamId2});
 
-await teams.LeaveAsync(new() {Account = accountId, Team = teamId});
-await teams.DeleteAsync(teamId);
+try
+{
+    using var streaming = teams.ListByMember(accountId);
+    while (await streaming.ResponseStream.MoveNext(default))
+        Console.WriteLine($"Account {accountId} is member of team {streaming.ResponseStream.Current}");
+}
+catch (RpcException ex) when (ex.StatusCode == StatusCode.Unimplemented)
+{
+    #pragma warning disable CS0612
+    Console.WriteLine($"Account {accountId} is member of team {await teams.FindByMemberAsync(accountId)}");
+    #pragma warning restore CS0612
+}
+
+await teams.LeaveAsync(new() {Account = accountId, Team = teamId1});
+await teams.LeaveAsync(new() {Account = accountId, Team = teamId2});
+await teams.DeleteAsync(teamId1);
+await teams.DeleteAsync(teamId2);
 await accounts.DeleteAsync(accountId);
