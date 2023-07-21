@@ -1,4 +1,7 @@
-﻿using Grpc.Net.Client;
+﻿using Google.Rpc;
+using Grpc.Core;
+using Grpc.Net.Client;
+using GrpcRichError;
 using Identity.Api;
 
 using var channel = GrpcChannel.ForAddress("http://localhost:5201");
@@ -21,7 +24,22 @@ await teams.CreateAsync(new()
     Seats = 1
 });
 
-await teams.JoinAsync(new() {Account = accountId, Team = teamId});
+try
+{
+    await teams.JoinAsync(new() {Account = accountId, Team = teamId});
+}
+catch (RpcException ex) when (ex.GetDetail<PreconditionFailure>() is { } failure
+                              && failure.Violations.Any(x => x.Type == "already_in_team"))
+{
+    Console.Error.WriteLine($"Account {accountId} is already in a team!");
+    return;
+}
+catch (RpcException ex) when (ex.GetDetail<PreconditionFailure>() is { } failure
+                              && failure.Violations.Any(x => x.Type == "cannot_join_team"))
+{
+    Console.Error.WriteLine($"Account {accountId} cannot join the team!");
+    return;
+}
 
 Console.WriteLine($"Account {accountId} is member of team {await teams.FindByMemberAsync(accountId)}");
 

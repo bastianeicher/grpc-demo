@@ -1,4 +1,7 @@
+using Google.Rpc;
+using GrpcRichError;
 using Identity.Api;
+using Status = Grpc.Core.Status;
 
 namespace Identity.Service;
 
@@ -49,11 +52,29 @@ public class TeamsService : Teams.TeamsBase
         return new();
     }
 
+#pragma warning disable CS8602
     public override async Task<Empty> Join(TeamMembership request, ServerCallContext context)
     {
-        var account = await _db.Accounts.FirstOrDefaultAsync(x => x.Id == request.Account)
-                   ?? throw new RpcException(new Status(StatusCode.NotFound, "not_found"));
-        if (account.Team != null) throw new RpcException(new Status(StatusCode.FailedPrecondition, "cannot_join_team"));
+        var account = await _db.Accounts.FirstOrDefaultAsync(x => x.Id == request.Account);
+        if (account.Team != null)
+        {
+            throw new Google.Rpc.Status
+            {
+                Code = (int)StatusCode.FailedPrecondition,
+                Message = "Already in a team",
+                Details =
+                {
+                    new PreconditionFailure
+                    {
+                        Violations =
+                        {
+                            new PreconditionFailure.Types.Violation {Type = "already_in_team"},
+                            new PreconditionFailure.Types.Violation {Type = "cannot_join_team"}
+                        }
+                    }
+                }
+            }.ToException();
+        }
 
         account.Team = await FindAsync(request.Team);
         await _db.SaveChangesAsync();

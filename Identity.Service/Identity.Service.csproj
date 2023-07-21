@@ -4,6 +4,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.9" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.49.0" />
     <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.55.0" />
+    <PackageReference Include="GrpcRichError" Version="0.1.4" />
     <ProjectReference Include="..\Identity.Api\Identity.Api.csproj" />
   </ItemGroup>
 
