@@ -2,6 +2,7 @@ using Identity.Api;
 
 namespace Identity.Service;
 
+[Authorize]
 public class AccountsService : Accounts.AccountsBase
 {
     private readonly IdentityDbContext _db;

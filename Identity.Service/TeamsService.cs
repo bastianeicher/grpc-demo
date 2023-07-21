@@ -2,6 +2,7 @@ using Identity.Api;
 
 namespace Identity.Service;
 
+[Authorize]
 public class TeamsService : Teams.TeamsBase
 {
     private readonly IdentityDbContext _db;

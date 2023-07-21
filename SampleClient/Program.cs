@@ -1,7 +1,11 @@
 ﻿using Grpc.Net.Client;
 using Identity.Api;
 
-using var channel = GrpcChannel.ForAddress("http://localhost:5201");
+const string apiKey = "my-secret-key";
+using var channel = GrpcChannel.ForAddress("http://localhost:5201", new()
+{
+    HttpClient = new() {DefaultRequestHeaders = {{"x-api-key", apiKey}}}
+});
 var accounts = new Accounts.AccountsClient(channel);
 var teams = new Teams.TeamsClient(channel);
 

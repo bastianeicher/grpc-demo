@@ -8,6 +8,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="Microsoft.AspNetCore.Authentication" />
+    <Using Include="Microsoft.AspNetCore.Authorization" />
     <Using Include="Microsoft.EntityFrameworkCore" />
     <Using Include="Google.Protobuf.WellKnownTypes" />
     <Using Include="Grpc.Core" />
