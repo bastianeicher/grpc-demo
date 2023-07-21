@@ -1,11 +1,11 @@
-using Identity.Api;
+using Identity.Api.V1;
 
 namespace Identity.Service;
 
-public class TeamsService : Teams.TeamsBase
+public class TeamsV1Service : Teams.TeamsBase
 {
     private readonly IdentityDbContext _db;
-    public TeamsService(IdentityDbContext db) => _db = db;
+    public TeamsV1Service(IdentityDbContext db) => _db = db;
 
     public override async Task<Empty> Create(Team request, ServerCallContext context)
     {

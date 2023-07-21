@@ -1,6 +1,6 @@
 syntax = "proto3";
-package identity;
-option csharp_namespace = "Identity.Api";
+package identity.v1;
+option csharp_namespace = "Identity.Api.V1";
 
 import "google/protobuf/empty.proto";
 

@@ -7,8 +7,8 @@ builder.Services.AddDbContext<IdentityDbContext>(
 
 var app = builder.Build();
 app.MapHealthChecks("health");
-app.MapGrpcService<AccountsService>();
-app.MapGrpcService<TeamsService>();
+app.MapGrpcService<AccountsV1Service>();
+app.MapGrpcService<TeamsV1Service>();
 app.MapGrpcReflectionService();
 await app.Services.GetRequiredService<IdentityDbContext>().Database.EnsureCreatedAsync();
 

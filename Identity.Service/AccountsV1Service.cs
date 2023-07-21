@@ -1,11 +1,11 @@
-using Identity.Api;
+using Identity.Api.V1;
 
 namespace Identity.Service;
 
-public class AccountsService : Accounts.AccountsBase
+public class AccountsV1Service : Accounts.AccountsBase
 {
     private readonly IdentityDbContext _db;
-    public AccountsService(IdentityDbContext db) => _db = db;
+    public AccountsV1Service(IdentityDbContext db) => _db = db;
 
     public override async Task<Empty> Create(Account request, ServerCallContext context)
     {

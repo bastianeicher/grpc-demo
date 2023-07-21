@@ -1,4 +1,4 @@
-﻿namespace Identity.Api;
+﻿namespace Identity.Api.V1;
 
 partial class TeamId
 {

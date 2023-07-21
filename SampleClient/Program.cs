@@ -1,5 +1,5 @@
 ﻿using Grpc.Net.Client;
-using Identity.Api;
+using Identity.Api.V1;
 
 using var channel = GrpcChannel.ForAddress("http://localhost:5201");
 var accounts = new Accounts.AccountsClient(channel);
