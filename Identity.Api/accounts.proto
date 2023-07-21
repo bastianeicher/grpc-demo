@@ -2,14 +2,38 @@ syntax = "proto3";
 package identity;
 option csharp_namespace = "Identity.Api";
 
-import "google/protobuf/empty.proto";
-
-service Accounts {
-  rpc Create (Account)   returns (google.protobuf.Empty);
-  rpc Read   (AccountId) returns (Account);
-  rpc Update (Account)   returns (google.protobuf.Empty);
-  rpc Delete (AccountId) returns (google.protobuf.Empty);
+service AccountsService {
+  rpc Create (AccountsServiceCreateRequest) returns (AccountsServiceCreateResponse);
+  rpc Read   (AccountsServiceReadRequest)   returns (AccountsServiceReadResponse);
+  rpc Update (AccountsServiceUpdateRequest) returns (AccountsServiceUpdateResponse);
+  rpc Delete (AccountsServiceDeleteRequest) returns (AccountsServiceDeleteResponse);
 }
+
+message AccountsServiceCreateRequest {
+  Account account = 1;
+}
+
+message AccountsServiceCreateResponse { }
+
+message AccountsServiceReadRequest {
+  AccountId id = 1;
+}
+
+message AccountsServiceReadResponse {
+  Account account = 1;
+}
+
+message AccountsServiceUpdateRequest {
+  AccountId id = 1;
+}
+
+message AccountsServiceUpdateResponse { }
+
+message AccountsServiceDeleteRequest {
+  AccountId id = 1;
+}
+
+message AccountsServiceDeleteResponse { }
 
 message AccountId {
   string uuid = 1;
