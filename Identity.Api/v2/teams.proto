@@ -1,0 +1,33 @@
+syntax = "proto3";
+package identity.v2;
+option csharp_namespace = "Identity.Api.V2";
+
+import "google/protobuf/empty.proto";
+import "v2/accounts.proto";
+
+service Teams {
+  rpc Create (Team)   returns (google.protobuf.Empty);
+  rpc Read   (TeamId) returns (Team);
+  rpc Update (Team)   returns (google.protobuf.Empty);
+  rpc Delete (TeamId) returns (google.protobuf.Empty);
+
+  rpc Join         (TeamMembership) returns (google.protobuf.Empty);
+  rpc Leave        (TeamMembership) returns (google.protobuf.Empty);
+  rpc ListMembers  (TeamId)         returns (stream AccountId);
+  rpc ListByMember (AccountId)      returns (stream TeamId);
+}
+
+message TeamId {
+  string uuid = 1;
+}
+
+message Team {
+  TeamId id = 1;
+  string name = 2;
+  int32 seats = 3;
+}
+
+message TeamMembership {
+  AccountId account = 1;
+  TeamId team = 2;
+}

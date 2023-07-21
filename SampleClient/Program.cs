@@ -1,5 +1,5 @@
 ﻿using Grpc.Net.Client;
-using Identity.Api.V1;
+using Identity.Api.V2;
 
 using var channel = GrpcChannel.ForAddress("http://localhost:5201");
 var accounts = new Accounts.AccountsClient(channel);
@@ -23,7 +23,9 @@ await teams.CreateAsync(new()
 
 await teams.JoinAsync(new() {Account = accountId, Team = teamId});
 
-Console.WriteLine($"Account {accountId} is member of team {await teams.FindByMemberAsync(accountId)}");
+using var streaming = teams.ListByMember(accountId);
+while (await streaming.ResponseStream.MoveNext(default))
+    Console.WriteLine($"Account {accountId} is member of team {streaming.ResponseStream.Current}");
 
 await teams.LeaveAsync(new() {Account = accountId, Team = teamId});
 await teams.DeleteAsync(teamId);

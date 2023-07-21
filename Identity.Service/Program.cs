@@ -9,6 +9,8 @@ var app = builder.Build();
 app.MapHealthChecks("health");
 app.MapGrpcService<AccountsV1Service>();
 app.MapGrpcService<TeamsV1Service>();
+app.MapGrpcService<AccountsV2Service>();
+app.MapGrpcService<TeamsV2Service>();
 app.MapGrpcReflectionService();
 await app.Services.GetRequiredService<IdentityDbContext>().Database.EnsureCreatedAsync();
 

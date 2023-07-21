@@ -8,5 +8,5 @@ public class AccountEntity
 
     public required string Email { get; set; }
 
-    public TeamEntity? Team { get; set; }
+    public ICollection<TeamEntity> Teams { get; set; } = new List<TeamEntity>();
 }

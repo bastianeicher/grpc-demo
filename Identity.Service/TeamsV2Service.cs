@@ -1,11 +1,11 @@
-using Identity.Api.V1;
+using Identity.Api.V2;
 
 namespace Identity.Service;
 
-public class TeamsV1Service : Teams.TeamsBase
+public class TeamsV2Service : Teams.TeamsBase
 {
     private readonly IdentityDbContext _db;
-    public TeamsV1Service(IdentityDbContext db) => _db = db;
+    public TeamsV2Service(IdentityDbContext db) => _db = db;
 
     public override async Task<Empty> Create(Team request, ServerCallContext context)
     {
@@ -87,12 +87,11 @@ public class TeamsV1Service : Teams.TeamsBase
             await responseStream.WriteAsync(new(account.Id));
     }
 
-    public override async Task<TeamId> FindByMember(AccountId request, ServerCallContext context)
+    public override async Task ListByMember(AccountId request, IServerStreamWriter<TeamId> responseStream, ServerCallContext context)
     {
         var account = await FindAccountAsync(request);
-        var team = account.Teams.FirstOrDefault()
-                ?? throw new RpcException(new Status(StatusCode.FailedPrecondition, "not_in_team"));
-        return new(team.Id);
+        foreach (var team in account.Teams)
+            await responseStream.WriteAsync(new(team.Id));
     }
 
     private async Task<AccountEntity> FindAccountAsync(AccountId accountId)
